@@ -1,5 +1,6 @@
 from logging.config import fileConfig
 
+from dotenv import load_dotenv
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
@@ -8,6 +9,27 @@ from alembic import context
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+import os
+
+# Load environment variables from .env based on the environment
+env = os.getenv('ENVIRONMENT', 'prod')
+if env == 'prod':
+    load_dotenv('.env.prod')
+else:
+    load_dotenv('.env.dev')
+# Read environment variables
+db_user = os.getenv('DB_USER')
+db_password = os.getenv('DB_PASSWORD')
+db_name = os.getenv('DB_NAME')
+db_host = os.getenv('DB_HOST')
+db_port = os.getenv('DB_PORT')
+
+# Construct the database URL
+sqlalchemy_url = f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
+
+# Update the Alembic configuration
+config.set_main_option('sqlalchemy.url', sqlalchemy_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

@@ -1,14 +1,10 @@
 from fastapi import FastAPI # type: ignore
-import response
 from config import database
-import models
+from api.patologi.routes import router as patologi_router
+from api.terminologi.routes import router as terminologi_router
 
-models.Base.metadata.create_all(bind=database.engine)
+database.Base.metadata.create_all(bind=database.engine)
 app = FastAPI()
 
-
-@app.get("/patologi/", response_model=list[response.PatologiResponse])
-def get_all_patologi():
-    db = database.SessionLocal()
-    patologis = db.query(models.Patologi).all()
-    return patologis
+app.include_router(patologi_router)
+app.include_router(terminologi_router)

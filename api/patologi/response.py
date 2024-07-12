@@ -1,3 +1,4 @@
+from datetime import date
 from pydantic import BaseModel # type: ignore
 
 
@@ -12,8 +13,8 @@ class PatologiDetailResponse(BaseModel):
     nama: str
     foto: str
     deskripsi: str
-    createdAt: str
-    updatedAt: str
+    createdAt: date
+    updatedAt: date
     
     class Config:
         orm_mode = True 
