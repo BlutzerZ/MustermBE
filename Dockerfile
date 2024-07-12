@@ -1,16 +1,17 @@
 # 
 FROM python:3.10
 # 
-WORKDIR /app/musterm-be
+WORKDIR /app/mustermAPI
 
 # 
-COPY ./requirements.txt /app/musterm-be/requirements.txt
+COPY ./requirements.txt /app/mustermAPI/requirements.txt
 
 # 
-RUN pip install --no-cache-dir --upgrade -r /app/musterm-be/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /app/mustermAPI/requirements.txt
 
 # 
-COPY . /app/musterm-be
-
+COPY . /app/mustermAPI
+#
+EXPOSE 8000
 # 
 CMD ["fastapi", "run", "main.py", "--port", "8001"]

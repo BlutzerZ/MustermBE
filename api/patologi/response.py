@@ -5,6 +5,7 @@ from pydantic import BaseModel # type: ignore
 class PatologiResponse(BaseModel):
     id: int
     nama: str
+    deskripsi: str
     
     class Config:
         orm_mode = True 
