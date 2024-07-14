@@ -1,4 +1,6 @@
 from typing import Union
+
+from sqlalchemy import or_
 from config import database
 from api.patologi import models, response, request
 from fastapi import APIRouter
@@ -17,7 +19,8 @@ async def get_all_patologi(
     else:
         offset = (page - 1) * limit
         patologis = db.query(models.Patologi).offset(offset).limit(limit).all()
-
+        
+    db.close()
     return patologis
 
 
@@ -28,6 +31,8 @@ async def get_by_id_patologi(
     db = database.SessionLocal()
 
     patologi = db.query(models.Patologi).filter_by(id=patologi_id).first()
+    
+    db.close()
     return patologi
 
 
@@ -103,5 +108,7 @@ async def search_patologii(
     ):
     db = database.SessionLocal()
 
-    patologis = db.query(models.Patologi).filter(models.Patologi.nama.ilike(f"%{q}%")).all()
+    patologis = db.query(models.Patologi).filter(or_(models.Patologi.nama.ilike(f"%{q}%"), models.Patologi.deskripsi.ilike(f"%{q}%"))).all()
+    
+    db.close()
     return patologis

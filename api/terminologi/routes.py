@@ -2,6 +2,7 @@ from config import database
 from api.terminologi import models, response, request
 from fastapi import APIRouter
 from typing import Union
+from sqlalchemy import and_, or_
 
 router = APIRouter()
 
@@ -25,7 +26,8 @@ async def get_paged_terminologi(
             terminologis = db.query(models.Terminologi).offset(offset).limit(limit).all()
         else:
             terminologis = db.query(models.Terminologi).filter_by(kategori=cat).offset(offset).limit(limit).all()
-
+    
+    db.close()
     return terminologis
 
 @router.get("/terminologi/{terminologi_id}", response_model=response.TerminologiDetailsResponse, tags=["Terminologi"])
@@ -34,6 +36,8 @@ async def get_by_id_terminologi(
     ):
     db = database.SessionLocal()
     terminologi = db.query(models.Terminologi).filter_by(id=terminologi_id).first()
+    
+    db.close()
     return terminologi
 
 @router.post("/terminologi", response_model=response.TerminologiDetailsResponse, tags=["Terminologi"])
@@ -101,7 +105,15 @@ async def delete_terminologi(
 @router.get("/search/terminologi", response_model=list[response.TerminologiResponse], tags=["Terminologi"])
 async def get_by_id_terminologi(
         q: str,
+        cat: str,
     ):
     db = database.SessionLocal()
-    terminologis = db.query(models.Terminologi).filter(models.Terminologi.nama.ilike(q)).all()
+    terminologis = db.query(models.Terminologi).filter(and_(
+                                                            or_(
+                                                                models.Terminologi.nama.ilike(f"%{q}%"), 
+                                                                models.Terminologi.arti.ilike(f"%{q}%")
+                                                            ), 
+                                                            models.Terminologi.kategori == cat)
+                                                       ).all()
+    db.close()
     return terminologis

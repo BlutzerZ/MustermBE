@@ -1,4 +1,6 @@
 from typing import Union
+
+from sqlalchemy import or_
 from config import database
 from api.anatomi import models, response, request
 from fastapi import APIRouter
@@ -18,6 +20,7 @@ async def get_all_anatomi(
         offset = (page - 1) * limit
         anatomis = db.query(models.Anatomi).offset(offset).limit(limit).all()
 
+    db.close()
     return anatomis
 
 
@@ -28,6 +31,8 @@ async def get_by_id_anatomi(
     db = database.SessionLocal()
 
     anatomi = db.query(models.Anatomi).filter_by(id=anatomi_id).first()
+    
+    db.close()
     return anatomi
 
 
@@ -103,5 +108,7 @@ async def search_anatomii(
     ):
     db = database.SessionLocal()
 
-    anatomis = db.query(models.Anatomi).filter(models.Anatomi.nama.ilike(f"%{q}%")).all()
+    anatomis = db.query(models.Anatomi).filter(or_(models.Anatomi.nama.ilike(f"%{q}%"), models.Anatomi.deskripsi.ilike(f"%{q}%"))).all()
+    
+    db.close()
     return anatomis
